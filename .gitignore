@@ -1,0 +1,47 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor/IDE
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.sublime-*
+
+# Claude Code local settings
+.claude/
+
+# Python (if any scripts use Python)
+.env
+.venv/
+__pycache__/
+*.pyc
+
+# Backup files
+*.backup
+*.bak
+*.orig
+*~
+
+# Attic/archive directory
+_attic/
+
+# Test files and temporary scripts
+test-*
+tmp-*
+scratch-*
+*.test
+
+# Local config files (users testing locally)
+.tmux-tools.yaml.local
+.tmux-tools.yml.local
+
+# Log files
+*.log
+
+# Build artifacts (if any)
+dist/
+build/
