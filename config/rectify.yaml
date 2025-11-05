@@ -1,0 +1,179 @@
+# emoji-rectifier Configuration
+#
+# This file defines how emoji should be rectified (converted to tasteful text).
+# The tool uses Unicode variation selectors and smart substitutions to make
+# documentation look professional while preserving semantic meaning.
+
+# Rule Categories
+# Each category can be enabled/disabled independently
+rules:
+  # ========================================
+  # ARROWS - Always use text arrows, not goofy emoji arrows
+  # ========================================
+  arrows:
+    enabled: true
+    mode: variation-selector
+    description: Add U+FE0E variation selector to force text-style rendering
+
+    mappings:
+      # Basic directional arrows - add VS15 (U+FE0E)
+      "→": "→\uFE0E"  # U+2192 RIGHTWARDS ARROW
+      "←": "←\uFE0E"  # U+2190 LEFTWARDS ARROW
+      "↑": "↑\uFE0E"  # U+2191 UPWARDS ARROW
+      "↓": "↓\uFE0E"  # U+2193 DOWNWARDS ARROW
+
+      # Bidirectional arrows
+      "↔": "↔\uFE0E"  # U+2194 LEFT RIGHT ARROW
+      "↕": "↕\uFE0E"  # U+2195 UP DOWN ARROW
+
+      # Diagonal arrows
+      "↖": "↖\uFE0E"  # U+2196 NORTH WEST ARROW
+      "↗": "↗\uFE0E"  # U+2197 NORTH EAST ARROW
+      "↘": "↘\uFE0E"  # U+2198 SOUTH EAST ARROW
+      "↙": "↙\uFE0E"  # U+2199 SOUTH WEST ARROW
+
+      # Heavy/bold arrows
+      "⬆": "⬆\uFE0E"  # U+2B06 UPWARDS BLACK ARROW
+      "⬇": "⬇\uFE0E"  # U+2B07 DOWNWARDS BLACK ARROW
+      "⬅": "⬅\uFE0E"  # U+2B05 LEFTWARDS BLACK ARROW
+      "➡": "➡\uFE0E"  # U+27A1 BLACK RIGHTWARDS ARROW
+
+      # Emoji-only arrows - replace with text equivalents
+      "🔼": "▲\uFE0E"  # Up-pointing triangle (cleaner than emoji button)
+      "🔽": "▼\uFE0E"  # Down-pointing triangle
+      "⏩": "➡\uFE0E"  # Fast forward → heavy right arrow
+      "⏪": "⬅\uFE0E"  # Fast backward → heavy left arrow
+      "⏫": "⬆\uFE0E"  # Fast up → heavy up arrow
+      "⏬": "⬇\uFE0E"  # Fast down → heavy down arrow
+
+  # ========================================
+  # CHECKMARKS & XES - Always use text marks, not awful emoji
+  # ========================================
+  checks:
+    enabled: true
+    mode: substitute
+    description: Replace emoji checkmarks and Xes with clean text equivalents
+
+    mappings:
+      # Checkmarks → simple CHECK MARK (U+2713)
+      "✅": "✓\uFE0E"  # Heavy check mark → light check
+      "☑": "✓\uFE0E"   # Ballot box with check → light check
+      "✔": "✓\uFE0E"   # Heavy check mark → light check
+      "☑️": "✓\uFE0E"  # Ballot box with VS16 → light check
+
+      # X marks → simple MULTIPLICATION X (U+2717)
+      "❌": "✗\uFE0E"  # Cross mark emoji → multiplication X
+      "❎": "✗\uFE0E"  # Cross mark button → multiplication X
+      "✖": "✗\uFE0E"   # Heavy multiplication X → light X
+      "✖️": "✗\uFE0E"  # Heavy multiplication with VS16 → light X
+
+    # Alternative ASCII-style mappings (uncomment to use)
+    # Use these if you want even simpler, terminal-friendly output
+    # ascii_mappings:
+    #   "✅": "[x]"
+    #   "❌": "[ ]"
+    #   "☑": "[x]"
+
+  # ========================================
+  # STARS - Use tasteful stars, not GAUDY emoji
+  # ========================================
+  stars:
+    enabled: true
+    mode: substitute
+    description: Replace gaudy emoji stars with tasteful text alternatives
+
+    mappings:
+      # The most common offenders
+      "⭐": "★\uFE0E"   # Star emoji → black star (classic)
+      "✨": "*"         # Sparkles → simple asterisk (MOST TASTEFUL!)
+      "🌟": "☆\uFE0E"   # Glowing star → white star
+      "💫": "✦\uFE0E"   # Dizzy → four-pointed star
+
+      # Other star-like emoji
+      "🌠": "·"         # Shooting star → middot (subtle)
+      "⚡": "⚡\uFE0E"   # High voltage → with VS15
+      "💥": "*"         # Collision → asterisk
+      "🔆": "☀\uFE0E"   # Bright button → sun symbol
+
+      # Multi-star patterns (processed before single stars)
+      "✨✨✨": "***"    # Triple sparkle → triple asterisk
+      "✨✨": "**"      # Double sparkle → double asterisk
+
+# ========================================
+# File Processing Options
+# ========================================
+
+# File types to process
+file_types:
+  - .md      # Markdown (primary target)
+  - .txt     # Plain text
+  # Add more as needed:
+  # - .rst   # reStructuredText
+  # - .org   # Org mode
+
+# Patterns to exclude from processing
+exclude_patterns:
+  - .git/*           # Git internals
+  - node_modules/*   # JavaScript dependencies
+  - .obsidian/*      # Obsidian vault metadata
+  - .venv/*          # Python virtual environments
+  - venv/*           # Alternative venv name
+  - __pycache__/*    # Python cache
+  - "*.pyc"          # Compiled Python files
+  - .DS_Store        # macOS metadata
+
+# Add custom excludes here:
+# - vendor/*
+# - third_party/*
+# - legacy/*
+
+# ========================================
+# Advanced Options
+# ========================================
+
+# Backup settings (when using --backup flag)
+backup:
+  enabled: false
+  suffix: .bak
+  # Keep multiple backups: .bak, .bak.1, .bak.2, etc.
+  rotate: false
+  max_backups: 5
+
+# Scanning options
+scan:
+  # Report format
+  default_format: text  # text or json
+
+  # Show file paths relative to scan root
+  relative_paths: true
+
+  # Max file size to process (bytes, 0 = unlimited)
+  max_file_size: 0
+
+# Verification options (for verify command)
+verify:
+  # Exit codes
+  pass_code: 0
+  fail_code: 1
+
+  # Quiet mode suppresses all output except errors
+  quiet_by_default: false
+
+# ========================================
+# Why This Configuration Exists
+# ========================================
+#
+# This tool exists because emoji have their place, but in technical
+# documentation they often:
+#   - Look unprofessional
+#   - Render inconsistently across platforms
+#   - Distract from the content
+#   - Break visual flow
+#
+# Text-style characters with variation selectors:
+#   - Render consistently everywhere
+#   - Look professional
+#   - Maintain semantic meaning
+#   - Respect Unicode standards (TR51)
+#
+# Make documentation great again. Tastefully.

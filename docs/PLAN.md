@@ -210,43 +210,58 @@ Summary:
   Stars fixed: 7
 ```
 
-## Configuration Format (config/rectify.json)
+## Configuration Format (config/rectify.yaml)
 
-```json
-{
-  "rules": {
-    "arrows": {
-      "enabled": true,
-      "mode": "variation-selector",
-      "mappings": {
-        "→": "→\uFE0E",
-        "←": "←\uFE0E",
-        "↑": "↑\uFE0E",
-        "↓": "↓\uFE0E",
-        "🔼": "▲\uFE0E"
-      }
-    },
-    "checks": {
-      "enabled": true,
-      "mode": "substitute",
-      "mappings": {
-        "✅": "✓\uFE0E",
-        "❌": "✗\uFE0E"
-      }
-    },
-    "stars": {
-      "enabled": true,
-      "mode": "substitute",
-      "mappings": {
-        "⭐": "★\uFE0E",
-        "✨": "*"
-      }
-    }
-  },
-  "file_types": [".md", ".txt"],
-  "exclude_patterns": [".git/*", "node_modules/*", ".obsidian/*"]
-}
+```yaml
+# emoji-rectifier Configuration
+rules:
+  # ARROWS - Always use text arrows, not goofy emoji arrows
+  arrows:
+    enabled: true
+    mode: variation-selector
+    description: Add U+FE0E variation selector to force text-style rendering
+    mappings:
+      "→": "→\uFE0E"  # U+2192 RIGHTWARDS ARROW
+      "←": "←\uFE0E"  # U+2190 LEFTWARDS ARROW
+      "↑": "↑\uFE0E"  # U+2191 UPWARDS ARROW
+      "↓": "↓\uFE0E"  # U+2193 DOWNWARDS ARROW
+      "🔼": "▲\uFE0E"  # Up-pointing triangle
+
+  # CHECKMARKS & XES - Always use text marks, not awful emoji
+  checks:
+    enabled: true
+    mode: substitute
+    description: Replace emoji checkmarks and Xes with clean text equivalents
+    mappings:
+      "✅": "✓\uFE0E"  # Heavy check mark → light check
+      "❌": "✗\uFE0E"  # Cross mark emoji → multiplication X
+
+  # STARS - Use tasteful stars, not GAUDY emoji
+  stars:
+    enabled: true
+    mode: substitute
+    description: Replace gaudy emoji stars with tasteful text alternatives
+    mappings:
+      "⭐": "★\uFE0E"  # Star emoji → black star (classic)
+      "✨": "*"        # Sparkles → simple asterisk (MOST TASTEFUL!)
+
+# File types to process
+file_types:
+  - .md      # Markdown (primary target)
+  - .txt     # Plain text
+
+# Patterns to exclude from processing
+exclude_patterns:
+  - .git/*           # Git internals
+  - node_modules/*   # JavaScript dependencies
+  - .obsidian/*      # Obsidian vault metadata
 ```
+
+**Note**: We use YAML instead of JSON because:
+- Comments make config files self-documenting
+- More Pythonic (matches pytest, pre-commit, GitHub Actions, etc.)
+- Cleaner syntax with less punctuation noise
+- Still just as easy to read/write as JSON
 
 ## Development Roadmap
 

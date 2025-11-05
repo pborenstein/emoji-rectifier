@@ -177,7 +177,7 @@ Replaces gaudy emoji stars with tasteful alternatives:
 
 ## Configuration
 
-Default configuration is in `config/rectify.json`. You can customize:
+Default configuration is in `config/rectify.yaml`. You can customize:
 
 - Which rules are enabled
 - Substitution mappings
