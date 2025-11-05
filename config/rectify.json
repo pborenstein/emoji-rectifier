@@ -1,0 +1,57 @@
+{
+  "rules": {
+    "arrows": {
+      "enabled": true,
+      "mode": "variation-selector",
+      "description": "Add U+FE0E to force text-style arrows",
+      "mappings": {
+        "→": "→\uFE0E",
+        "←": "←\uFE0E",
+        "↑": "↑\uFE0E",
+        "↓": "↓\uFE0E",
+        "↔": "↔\uFE0E",
+        "↕": "↕\uFE0E",
+        "⬆": "⬆\uFE0E",
+        "⬇": "⬇\uFE0E",
+        "⬅": "⬅\uFE0E",
+        "➡": "➡\uFE0E",
+        "🔼": "▲\uFE0E",
+        "🔽": "▼\uFE0E"
+      }
+    },
+    "checks": {
+      "enabled": true,
+      "mode": "substitute",
+      "description": "Replace emoji checkmarks with text equivalents",
+      "mappings": {
+        "✅": "✓\uFE0E",
+        "❌": "✗\uFE0E",
+        "☑": "✓\uFE0E",
+        "✔": "✓\uFE0E",
+        "❎": "✗\uFE0E",
+        "✖": "✗\uFE0E"
+      }
+    },
+    "stars": {
+      "enabled": true,
+      "mode": "substitute",
+      "description": "Replace gaudy emoji stars with tasteful text",
+      "mappings": {
+        "⭐": "★\uFE0E",
+        "✨": "*",
+        "🌟": "☆\uFE0E",
+        "💫": "✦\uFE0E",
+        "🌠": "·"
+      }
+    }
+  },
+  "file_types": [
+    ".md",
+    ".txt"
+  ],
+  "exclude_patterns": [
+    ".git/*",
+    "node_modules/*",
+    ".obsidian/*"
+  ]
+}
