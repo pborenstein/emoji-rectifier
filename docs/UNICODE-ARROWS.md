@@ -92,6 +92,105 @@ If you see `Emoji_Presentation`, the character may render as emoji by default.
 - Some editors have "show invisibles" mode that reveals them
 - To type VS15: Copy from this doc or use hex input (depends on OS/editor)
 
+## Understanding UTF-8 Encoding vs Unicode Code Points
+
+**Important distinction:**
+- **U+FE0E** is the **Unicode code point** (a number in the Unicode standard)
+- **EF B8 8E** is the **UTF-8 encoding** (the actual bytes stored in files)
+
+### Why the Difference?
+
+UTF-8 is a **variable-length** encoding - it uses different numbers of bytes for different characters:
+
+| Range | Bytes | Example |
+|-------|-------|---------|
+| U+0000 to U+007F | 1 byte | `A` = U+0041 = `41` |
+| U+0080 to U+07FF | 2 bytes | `é` = U+00E9 = `C3 A9` |
+| U+0800 to U+FFFF | **3 bytes** | **← U+FE0E is here** |
+| U+10000 to U+10FFFF | 4 bytes | `🔼` = U+1F53C = `F0 9F 94 BC` |
+
+### How UTF-8 Encoding Works
+
+**The Problem:** How does a program reading bytes know if it's looking at:
+- One 1-byte character?
+- The start of a 3-byte character?
+- The middle of a 4-byte character?
+
+**The Solution:** UTF-8 uses **special bit patterns** (templates) that mark:
+- How many bytes this character uses
+- Which bytes are data vs markers
+
+### The Template System
+
+For 3-byte characters (like U+FE0E), UTF-8 uses this template:
+
+```
+Byte 1:  1110xxxx   ← "1110" means "this is a 3-byte character"
+Byte 2:  10xxxxxx   ← "10" means "this is a continuation byte"
+Byte 3:  10xxxxxx   ← "10" means "this is a continuation byte"
+         ^^^^^^^^
+         These are data bits (where the actual number goes)
+```
+
+The `1110` and `10` parts are **fixed** - they tell the decoder "this is 3 bytes long."
+
+The `xxxx` parts are **variable** - this is where we put our actual Unicode number.
+
+### Step-by-Step: Encoding U+FE0E
+
+**Step 1:** Convert U+FE0E to binary:
+```
+U+FE0E = FE0E (hex) = 1111111000001110 (binary)
+         ^^^^ ^^^^ ^^^^ ^^^^
+         F    E    0    E
+```
+
+**Step 2:** Count the bits:
+```
+1111111000001110 = 16 bits
+```
+
+A 3-byte template gives us 16 data bits (4 + 6 + 6), so it fits perfectly!
+
+**Step 3:** Split the 16 bits to fit the template:
+```
+Original bits: 1111 111000 001110
+                ^^^^ ^^^^^^ ^^^^^^
+                4b   6b     6b     ← These fit into the xxxx slots
+```
+
+**Step 4:** Insert into the 3-byte template:
+```
+Template:  1110xxxx  10xxxxxx  10xxxxxx
+Insert:    1110[1111] 10[111000] 10[001110]
+Result:    11101111  10111000  10001110
+```
+
+**Step 5:** Convert to hex:
+```
+11101111 = EF (hex)
+10111000 = B8 (hex)
+10001110 = 8E (hex)
+```
+
+**Final answer:** U+FE0E = **EF B8 8E** in UTF-8!
+
+That's why when you search for U+FE0E in a hex dump, you look for `EF B8 8E`!
+
+### Quick Verification
+
+```bash
+# Python proof:
+python3 -c "print('\uFE0E'.encode('utf-8').hex())"
+# Output: efb88e
+
+# A rectified arrow (→ + VS15):
+python3 -c "print('→\uFE0E'.encode('utf-8').hex())"
+# Output: e28692efb88e
+#         ^^^^^^ ^^^^^^
+#         U+2192 U+FE0E
+```
+
 ## How to See U+FE0E (The Invisible Character)
 
 Variation selectors are invisible by design, which makes them tricky to work with.
@@ -149,13 +248,24 @@ M-x describe-char           " Shows full Unicode info at point
 
 ## How to Type U+FE0E
 
-### Method 1: Copy-Paste (Easiest)
+### Method 1: Copy-Paste (Easiest and Most Reliable)
+
+**This is the recommended method!**
 
 Copy this variation selector: `︎` (between quotes: "︎")
 
-Or copy from existing text:
+Or copy from existing rectified text:
 ```
 ↕︎ ↔︎ ↑︎ ↓︎ ←︎ →︎
+```
+
+You won't see the variation selector itself, but it's there. To verify:
+```bash
+# Paste what you copied and check:
+echo "→︎" | od -An -tx1
+# Should show: e2 86 92 ef b8 8e
+#              ^^^^^^^^ ^^^^^^^^
+#              arrow    VS15
 ```
 
 ### Method 2: Shell/Scripts
@@ -177,14 +287,18 @@ printf '↕\uFE0E ↔\uFE0E ↑\uFE0E ↓\uFE0E ←\uFE0E →\uFE0E\n' > arrows.
 ### Method 3: OS-Specific Input
 
 **macOS:**
-- Open Character Viewer (Ctrl+Cmd+Space)
-- Search for "variation selector"
-- Double-click to insert
 
-Or use Unicode hex input:
-1. Enable "Unicode Hex Input" in System Preferences > Keyboard > Input Sources
-2. Hold Option and type: `FE0E`
-3. Release Option
+The Character Viewer (Ctrl+Cmd+Space) doesn't show variation selectors usefully - they're invisible and won't appear in search results.
+
+**Best method:** Use Unicode Hex Input
+1. Enable "Unicode Hex Input" in System Settings > Keyboard > Input Sources > Edit...
+2. Switch to Unicode Hex Input (usually via menu bar or a keyboard shortcut)
+3. Hold Option and type: `FE0E`
+4. Release Option
+
+**Easier method:** Just copy from this document!
+- Copy this: `︎` (there's a VS15 between the quotes, though you can't see it)
+- Or copy from a rectified character: `→︎` (arrow with VS15 already added)
 
 **Linux (GTK apps):**
 ```
