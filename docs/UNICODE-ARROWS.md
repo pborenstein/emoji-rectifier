@@ -100,23 +100,80 @@ If you see `Emoji_Presentation`, the character may render as emoji by default.
 
 ### Why the Difference?
 
-UTF-8 is a variable-length encoding scheme:
-- U+0000 to U+007F: 1 byte (ASCII range)
-- U+0080 to U+07FF: 2 bytes
-- U+0800 to U+FFFF: **3 bytes** ← U+FE0E is here
-- U+10000 to U+10FFFF: 4 bytes (emoji, etc.)
+UTF-8 is a **variable-length** encoding - it uses different numbers of bytes for different characters:
 
-### The Encoding Math
+| Range | Bytes | Example |
+|-------|-------|---------|
+| U+0000 to U+007F | 1 byte | `A` = U+0041 = `41` |
+| U+0080 to U+07FF | 2 bytes | `é` = U+00E9 = `C3 A9` |
+| U+0800 to U+FFFF | **3 bytes** | **← U+FE0E is here** |
+| U+10000 to U+10FFFF | 4 bytes | `🔼` = U+1F53C = `F0 9F 94 BC` |
 
-U+FE0E in binary: `1111 1110 0000 1110`
+### How UTF-8 Encoding Works
 
-UTF-8 uses a 3-byte template for this range:
+**The Problem:** How does a program reading bytes know if it's looking at:
+- One 1-byte character?
+- The start of a 3-byte character?
+- The middle of a 4-byte character?
+
+**The Solution:** UTF-8 uses **special bit patterns** (templates) that mark:
+- How many bytes this character uses
+- Which bytes are data vs markers
+
+### The Template System
+
+For 3-byte characters (like U+FE0E), UTF-8 uses this template:
+
 ```
-Template:  1110xxxx 10xxxxxx 10xxxxxx
-Split:     1111     111000   001110
-Result:    11101111 10111000 10001110
-Hex:       EF       B8       8E
+Byte 1:  1110xxxx   ← "1110" means "this is a 3-byte character"
+Byte 2:  10xxxxxx   ← "10" means "this is a continuation byte"
+Byte 3:  10xxxxxx   ← "10" means "this is a continuation byte"
+         ^^^^^^^^
+         These are data bits (where the actual number goes)
 ```
+
+The `1110` and `10` parts are **fixed** - they tell the decoder "this is 3 bytes long."
+
+The `xxxx` parts are **variable** - this is where we put our actual Unicode number.
+
+### Step-by-Step: Encoding U+FE0E
+
+**Step 1:** Convert U+FE0E to binary:
+```
+U+FE0E = FE0E (hex) = 1111111000001110 (binary)
+         ^^^^ ^^^^ ^^^^ ^^^^
+         F    E    0    E
+```
+
+**Step 2:** Count the bits:
+```
+1111111000001110 = 16 bits
+```
+
+A 3-byte template gives us 16 data bits (4 + 6 + 6), so it fits perfectly!
+
+**Step 3:** Split the 16 bits to fit the template:
+```
+Original bits: 1111 111000 001110
+                ^^^^ ^^^^^^ ^^^^^^
+                4b   6b     6b     ← These fit into the xxxx slots
+```
+
+**Step 4:** Insert into the 3-byte template:
+```
+Template:  1110xxxx  10xxxxxx  10xxxxxx
+Insert:    1110[1111] 10[111000] 10[001110]
+Result:    11101111  10111000  10001110
+```
+
+**Step 5:** Convert to hex:
+```
+11101111 = EF (hex)
+10111000 = B8 (hex)
+10001110 = 8E (hex)
+```
+
+**Final answer:** U+FE0E = **EF B8 8E** in UTF-8!
 
 That's why when you search for U+FE0E in a hex dump, you look for `EF B8 8E`!
 
